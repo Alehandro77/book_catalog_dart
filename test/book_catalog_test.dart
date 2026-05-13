@@ -10,8 +10,8 @@ void main() {
 
     final genre = Genres(id: 'g1', name: 'Тестовый жанр');
     final publisher = PublishingHouses(id: 'p1', name: 'Тестовое издательство');
-    db.insertGenre(genre);
-    db.insertPublisher(publisher);
+    db.genres.insert(genre);
+    db.publishers.insert(publisher);
 
     final stopwatch = Stopwatch()..start();
     
@@ -24,13 +24,13 @@ void main() {
         genreId: 'g1',
         publisherId: 'p1',
       );
-      db.insertBook(book);
+      db.books.insert(book);
     }
     
     final insertTime = stopwatch.elapsedMilliseconds;
     stopwatch.reset();
 
-    final allBooks = db.getAllBooks();
+    final allBooks = db.books.getAll();
     final readTime = stopwatch.elapsedMilliseconds;
     
     stopwatch.stop();
