@@ -20,24 +20,30 @@
 
 ```text
 lib/
-  book_catalog.dart          # публичный экспорт
+  book_catalog.dart                # публичный экспорт
   src/
-    domain/                  # сущности и базовые интерфейсы
+    domain/                        # сущности и базовые интерфейсы
       identity.dart
       book.dart
       author.dart
       genre.dart
       publisher.dart
       book_author.dart
-    data/                    # SQLite и SQL-логика
-      book_database.dart
-    cli/                     # меню и обработка ввода
+    data/
+      book_database.dart           # Открытие SQLite, создание таблиц
+      repositories/                # Классы для CRUD
+        genre_repository.dart
+        publisher_repository.dart
+        book_repository.dart
+        author_repository.dart
+        book_author_repository.dart
+    cli/                           # меню и обработка ввода
       menu.dart
       input_helper.dart
 bin/
-  book_catalog.dart          # точка входа (main)
+  book_catalog.dart                # точка входа (main)
 test/
-  book_catalog_test.dart            # базовые тесты
+  book_catalog_test.dart           # базовые тесты
 ```
 
 ## Что вынесено в каждый слой и почему
