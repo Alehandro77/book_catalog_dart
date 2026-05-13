@@ -87,20 +87,20 @@ void runMenu(BookDatabase db) {
 }
 
 void _printBooks(BookDatabase db) {
-  final list = db.getAllBooks();
+  final list = db.books.getAll();
   if (list.isEmpty) {
     stdout.writeln('Книг нет.');
     return;
   }
   for (final b in list) {
-    final authors = db.getAuthorsByBookId(b.id);
+    final authors = db.bookAuthors.getAuthorsByBookId(b.id);
     final authorNames = authors.map((a) => '${a.firstName} ${a.lastName}').join(', ');
     stdout.writeln('id: ${b.id} | ${b.title} | ${b.year} | ${b.pageCount} стр | Авторы: $authorNames');
   }
 }
 
 void _printAuthors(BookDatabase db) {
-  final list = db.getAllAuthors();
+  final list = db.authors.getAll();
   if (list.isEmpty) {
     stdout.writeln('Авторов нет.');
     return;
@@ -111,7 +111,7 @@ void _printAuthors(BookDatabase db) {
 }
 
 void _printGenres(BookDatabase db) {
-  final list = db.getAllGenres();
+  final list = db.genres.getAll();
   if (list.isEmpty) {
     stdout.writeln('Жанров нет.');
     return;
@@ -122,7 +122,7 @@ void _printGenres(BookDatabase db) {
 }
 
 void _printPublishers(BookDatabase db) {
-  final list = db.getAllPublishers();
+  final list = db.publishers.getAll();
   if (list.isEmpty) {
     stdout.writeln('Издательств нет.');
     return;
@@ -143,7 +143,7 @@ void _printAllFromDb(BookDatabase db) {
   _printPublishers(db);
   
   print("\nСвязи книга-автор:");
-  final links = db.getAllBookAuthors();
+  final links = db.bookAuthors.getAll();
   if (links.isEmpty) {
     stdout.writeln('Связей нет.');
   } else {
@@ -163,19 +163,19 @@ void _addBook(BookDatabase db) {
   final genreId = readNonEmptyString('id жанра: ');
   final publisherId = readNonEmptyString('id издательства: ');
 
-  final genre = db.getGenreById(genreId);
+  final genre = db.genres.getById(genreId);
   if (genre == null) {
     stdout.writeln('Ошибка: жанр с id "$genreId" не найден.');
     return;
   }
 
-  final publisher = db.getPublisherById(publisherId);
+  final publisher = db.publishers.getById(publisherId);
   if (publisher == null) {
     stdout.writeln('Ошибка: издательство с id "$publisherId" не найдено.');
     return;
   }
 
-  db.insertBook(Book(
+  db.books.insert(Book(
     id: id,
     title: title,
     year: year,
@@ -188,13 +188,13 @@ void _addBook(BookDatabase db) {
 
 void _deleteBook(BookDatabase db) {
   final id = readNonEmptyString('id книги для удаления: ');
-  final book = db.getBookById(id);
+  final book = db.books.getById(id);
   if (book == null) {
     stdout.writeln('Ошибка: книга с id "$id" не найдена.');
     return;
   }
-  db.deleteAllBookAuthorsByBookId(id);
-  db.deleteBook(id);
+  db.bookAuthors.deleteByBookId(id);
+  db.books.delete(id);
   stdout.writeln('Книга удалена.');
 }
 
@@ -206,7 +206,7 @@ void _addAuthor(BookDatabase db) {
   final lastName = readNonEmptyString('фамилия: ');
   final birthYear = readOptionalPositiveInt('год рождения (Enter - пропустить): ');
 
-  db.insertAuthor(Author(
+  db.authors.insert(Author(
     id: id,
     firstName: firstName,
     lastName: lastName,
@@ -217,12 +217,12 @@ void _addAuthor(BookDatabase db) {
 
 void _deleteAuthor(BookDatabase db) {
   final id = readNonEmptyString('id автора для удаления: ');
-  final author = db.getAuthorById(id);
+  final author = db.authors.getById(id);
   if (author == null) {
     stdout.writeln('Ошибка: автор с id "$id" не найден.');
     return;
   }
-  db.deleteAuthor(id);
+  db.authors.delete(id);
   stdout.writeln('Автор удалён.');
 }
 
@@ -233,7 +233,7 @@ void _addGenre(BookDatabase db) {
   final name = readNonEmptyString('название: ');
   final description = readOptionalString('описание (Enter - пропустить): ');
 
-  db.insertGenre(Genres(
+  db.genres.insert(Genres(
     id: id,
     name: name,
     description: description.isEmpty ? null : description,
@@ -243,12 +243,12 @@ void _addGenre(BookDatabase db) {
 
 void _deleteGenre(BookDatabase db) {
   final id = readNonEmptyString('id жанра для удаления: ');
-  final genre = db.getGenreById(id);
+  final genre = db.genres.getById(id);
   if (genre == null) {
     stdout.writeln('Ошибка: жанр с id "$id" не найден.');
     return;
   }
-  db.deleteGenre(id);
+  db.genres.delete(id);
   stdout.writeln('Жанр удалён.');
 }
 
@@ -260,7 +260,7 @@ void _addPublisher(BookDatabase db) {
   final city = readOptionalString('город (Enter - пропустить): ');
   final foundationYear = readOptionalPositiveInt('год основания (Enter - пропустить): ');
 
-  db.insertPublisher(PublishingHouses(
+  db.publishers.insert(PublishingHouses(
     id: id,
     name: name,
     city: city.isEmpty ? null : city,
@@ -271,12 +271,12 @@ void _addPublisher(BookDatabase db) {
 
 void _deletePublisher(BookDatabase db) {
   final id = readNonEmptyString('id издательства для удаления: ');
-  final publisher = db.getPublisherById(id);
+  final publisher = db.publishers.getById(id);
   if (publisher == null) {
     stdout.writeln('Ошибка: издательство с id "$id" не найдено.');
     return;
   }
-  db.deletePublisher(id);
+  db.publishers.delete(id);
   stdout.writeln('Издательство удалено.');
 }
 
@@ -287,19 +287,19 @@ void _addBookAuthor(BookDatabase db) {
   final bookId = readNonEmptyString('id книги: ');
   final authorId = readNonEmptyString('id автора: ');
 
-  final book = db.getBookById(bookId);
+  final book = db.books.getById(bookId);
   if (book == null) {
     stdout.writeln('Ошибка: книга с id "$bookId" не найдена.');
     return;
   }
 
-  final author = db.getAuthorById(authorId);
+  final author = db.authors.getById(authorId);
   if (author == null) {
     stdout.writeln('Ошибка: автор с id "$authorId" не найден.');
     return;
   }
 
-  db.insertBookAuthor(BookAuthor(
+  db.bookAuthors.insert(BookAuthor(
     id: id,
     bookId: bookId,
     authorId: authorId,
