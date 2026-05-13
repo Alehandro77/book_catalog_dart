@@ -1,0 +1,9 @@
+export 'src/cli/input_helper.dart';
+export 'src/cli/menu.dart';
+export 'src/data/book_database.dart';
+export 'src/domain/books.dart';
+export 'src/domain/authors.dart';
+export 'src/domain/genres.dart';
+export 'src/domain/publishing_houses.dart';
+export 'src/domain/book_author.dart';
+export 'src/domain/identity.dart';
